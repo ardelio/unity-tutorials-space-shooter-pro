@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] // This make the variable an attribute and hence available withing the Editor but still remains a private variable.
-    private float _speed = 3.5f;
+    private float _speed = 10f;
 
     [SerializeField]
     private GameObject _laserPrefab;
@@ -16,11 +16,17 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
 
+    [SerializeField]
+    private GameObject _laserContainer;
+
     private float _canShootAfter = -1f;
+
+    private SpawnManager _spawnManager;
 
     void Start()
     {
-        transform.position = new Vector3(0, 0, 0);
+        transform.position = new Vector3(0, -3f, 0);
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
     }
 
     void Update()
@@ -35,6 +41,7 @@ public class Player : MonoBehaviour
 
         if (_lives < 1)
         {
+            _spawnManager.OnPlayerDeath();
             Destroy(gameObject);
         }
     }
@@ -85,7 +92,8 @@ public class Player : MonoBehaviour
         if (spaceKeyIsPressed && canShoot)
         {
             _canShootAfter = Time.time + _firingRate;
-            Instantiate(_laserPrefab, spawnPosition, Quaternion.identity);
+            GameObject newLaser = Instantiate(_laserPrefab, spawnPosition, Quaternion.identity);
+            newLaser.transform.SetParent(_laserContainer.transform);
         }
     }
 }

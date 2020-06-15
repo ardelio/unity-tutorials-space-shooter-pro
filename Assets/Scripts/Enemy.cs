@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         MoveDownwards();
-        resetWithRandomXCoord();
+        ResetWithRandomXCoord();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -38,16 +38,16 @@ public class Enemy : MonoBehaviour
         transform.Translate(Vector3.down * _speed * Time.deltaTime);
     }
 
-    private void resetWithRandomXCoord()
+    private void ResetWithRandomXCoord()
     {
-        float verticalWidthFromCentre = 8f;
+        float heightFromCentre = 8f;
         float horizontalWidthFromCenter = 9.3f;
         float randomXPosition = Random.Range(-horizontalWidthFromCenter, horizontalWidthFromCenter);
-        bool isOffScreen = transform.position.y < -verticalWidthFromCentre;
+        bool isOffScreen = transform.position.y < -heightFromCentre;
 
         if (isOffScreen)
         {
-            transform.position = new Vector3(randomXPosition, verticalWidthFromCentre, transform.position.z);
+            transform.position = new Vector3(randomXPosition, heightFromCentre, transform.position.z);
         }
     }
 }
