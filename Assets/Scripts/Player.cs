@@ -13,6 +13,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _firingRate = 0.5f;
 
+    [SerializeField]
+    private int _lives = 3;
+
     private float _canShootAfter = -1f;
 
     void Start()
@@ -24,6 +27,16 @@ public class Player : MonoBehaviour
     {
         CalculateMovement();
         ShootLaser();
+    }
+
+    public void Damage()
+    {
+        _lives--;
+
+        if (_lives < 1)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void CalculateMovement()
