@@ -84,7 +84,7 @@ public class Player : MonoBehaviour
 
     private void ShootLaser()
     {
-        Vector3 offset = new Vector3(0, 0.8f, 0);
+        Vector3 offset = new Vector3(0, 1.05f, 0);
         Vector3 spawnPosition = transform.position + offset;
         bool spaceKeyIsPressed = Input.GetKeyDown(KeyCode.Space);
         bool canShoot = Time.time > _canShootAfter;
