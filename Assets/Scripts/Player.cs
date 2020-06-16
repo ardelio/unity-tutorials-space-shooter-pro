@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -8,7 +9,10 @@ public class Player : MonoBehaviour
     private float _speed = 10f;
 
     [SerializeField]
-    private GameObject _laserPrefab;
+    private GameObject _laserPrefab = null;
+
+    [SerializeField]
+    private GameObject _tripleShotPrefab = null;
         
     [SerializeField]
     private float _firingRate = 0.5f;
@@ -17,11 +21,11 @@ public class Player : MonoBehaviour
     private int _lives = 3;
 
     [SerializeField]
-    private GameObject _laserContainer;
+    private GameObject _laserContainer = null;
 
     private float _canShootAfter = -1f;
-
-    private SpawnManager _spawnManager;
+    private SpawnManager _spawnManager = null;
+    private bool _isTripleShotActive = false;
 
     void Start()
     {
@@ -44,6 +48,13 @@ public class Player : MonoBehaviour
             _spawnManager.OnPlayerDeath();
             Destroy(gameObject);
         }
+    }
+
+    public void ActivateTripleShot()
+    {
+        _isTripleShotActive = true;
+
+        StartCoroutine(TripleShotPowerDownRoutine());
     }
 
     private void CalculateMovement()
@@ -84,16 +95,35 @@ public class Player : MonoBehaviour
 
     private void ShootLaser()
     {
-        Vector3 offset = new Vector3(0, 1.05f, 0);
-        Vector3 spawnPosition = transform.position + offset;
         bool spaceKeyIsPressed = Input.GetKeyDown(KeyCode.Space);
-        bool canShoot = Time.time > _canShootAfter;
+        bool cannotShoot = Time.time <= _canShootAfter;
+        GameObject newLaser;
 
-        if (spaceKeyIsPressed && canShoot)
+        if (!spaceKeyIsPressed || cannotShoot)
         {
-            _canShootAfter = Time.time + _firingRate;
-            GameObject newLaser = Instantiate(_laserPrefab, spawnPosition, Quaternion.identity);
-            newLaser.transform.SetParent(_laserContainer.transform);
+            return;
         }
+
+        _canShootAfter = Time.time + _firingRate;
+
+        if (_isTripleShotActive)
+        {
+            Vector3 spawnPosition = transform.position;
+            newLaser = Instantiate(_tripleShotPrefab, spawnPosition, Quaternion.identity);
+        } else
+        {
+            Vector3 offset = new Vector3(0, 1.05f, 0);
+            Vector3 spawnPosition = transform.position + offset;
+            newLaser = Instantiate(_laserPrefab, spawnPosition, Quaternion.identity);
+        }
+        
+        newLaser.transform.SetParent(_laserContainer.transform);
+    }
+
+    private IEnumerator TripleShotPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5f);
+
+        _isTripleShotActive = false;
     }
 }

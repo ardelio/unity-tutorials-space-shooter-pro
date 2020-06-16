@@ -24,6 +24,10 @@ public class Laser : MonoBehaviour
         bool isOffScreen = laserYPosition > 8f;
         if (isOffScreen)
         {
+            if (transform.parent != null && transform.parent.CompareTag("Laser"))
+            {
+                Destroy(transform.parent.gameObject);
+            }
             Destroy(gameObject);
         }
     }

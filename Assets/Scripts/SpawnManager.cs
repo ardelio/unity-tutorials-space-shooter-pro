@@ -5,22 +5,29 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _enemyPrefab;
+    private GameObject _enemyPrefab = null;
 
     [SerializeField]
-    private GameObject _enemyContainer;
+    private GameObject _enemyContainer = null;
 
     [SerializeField]
-    private float _spawnRateInSeconds = 5f;
+    private GameObject _powerUpPrefab = null;
+
+    [SerializeField]
+    private GameObject _powerUpContainer = null;
+
+    [SerializeField]
+    private float _enemySpawnRateInSeconds = 5f;
 
     private bool _canSpawn = true;
 
     void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        StartCoroutine(SpawnEnemyRoutine());
+        StartCoroutine(SpawnPowerUpRoutine());
     }
 
-    IEnumerator SpawnRoutine()
+    IEnumerator SpawnEnemyRoutine()
     {
         while(_canSpawn)
         {
@@ -31,7 +38,22 @@ public class SpawnManager : MonoBehaviour
             Vector3 startPosition = new Vector3(randomXPosition, yPosition, zPosition);
             GameObject newEnemy = Instantiate(_enemyPrefab, startPosition, Quaternion.identity);
             newEnemy.transform.SetParent(_enemyContainer.transform);
-            yield return new WaitForSeconds(_spawnRateInSeconds);
+            yield return new WaitForSeconds(_enemySpawnRateInSeconds);
+        }
+    }
+
+    IEnumerator SpawnPowerUpRoutine()
+    {
+        while (_canSpawn)
+        {
+            float yPosition = 8f;
+            float zPosition = 0f;
+            float widthFromCentre = 9.3f;
+            float randomXPosition = Random.Range(-widthFromCentre, widthFromCentre);
+            Vector3 startPosition = new Vector3(randomXPosition, yPosition, zPosition);
+            GameObject newPowerUp = Instantiate(_powerUpPrefab, startPosition, Quaternion.identity);
+            newPowerUp.transform.SetParent(_powerUpContainer.transform);
+            yield return new WaitForSeconds(Random.Range(3, 8));
         }
     }
 
