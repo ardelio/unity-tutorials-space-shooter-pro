@@ -29,8 +29,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _shieldVisualiser = null;
 
+    [SerializeField]
+    private int _score = 0;
+
     private float _canShootAfter = -1f;
     private SpawnManager _spawnManager = null;
+    private UIManager _uiManager = null;
     private bool _isTripleShotActive = false;
     private bool _isShieldActive = false;
 
@@ -38,6 +42,19 @@ public class Player : MonoBehaviour
     {
         transform.position = new Vector3(0, -3f, 0);
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_spawnManager == null)
+        {
+            throw new System.Exception("SpawnManager not found");
+        }
+
+        if (_uiManager == null)
+        {
+            throw new System.Exception("UIManager not found");
+        }
+
+        _uiManager.UpdateScore(_score);
     }
 
     void Update()
@@ -57,10 +74,11 @@ public class Player : MonoBehaviour
 
         _lives--;
 
+        _uiManager.UpdateLives(_lives);
+
         if (_lives < 1)
         {
-            _spawnManager.OnPlayerDeath();
-            Destroy(gameObject);
+            GameOver();
         }
     }
 
@@ -122,6 +140,12 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void GameOver()
+    {
+        _spawnManager.OnPlayerDeath();
+        Destroy(gameObject);
+    }
+
     private void ShootLaser()
     {
         bool spaceKeyIsPressed = Input.GetKeyDown(KeyCode.Space);
@@ -147,6 +171,12 @@ public class Player : MonoBehaviour
         }
         
         newLaser.transform.SetParent(_laserContainer.transform);
+    }
+
+    public void AddToScore(int points)
+    {
+        _score += points;
+        _uiManager.UpdateScore(_score);
     }
 
     private IEnumerator SpeedBoostPowerDownRoutine()

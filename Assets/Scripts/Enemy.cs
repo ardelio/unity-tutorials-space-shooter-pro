@@ -6,11 +6,18 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 4f;
+    private Player _player = null;
+
+    void Start()
+    {
+        _player = GetPlayer();
+    }
 
     void Update()
     {
         MoveDownwards();
         ResetWithRandomXCoord();
+        DestroyIfNoPlayer();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -28,9 +35,33 @@ public class Enemy : MonoBehaviour
         }
         else if (other.CompareTag("Laser"))
         {
+
             Destroy(other.gameObject);
+            if (_player != null)
+            {
+                _player.AddToScore(10);
+            }
             Destroy(gameObject);
         }
+    }
+
+    private Player GetPlayer()
+    {
+        GameObject playerGameObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerGameObject == null)
+        {
+            throw new System.ArgumentNullException("Cannot find GameObject with tag Player");
+        }
+
+        Player player = playerGameObject.transform.GetComponent<Player>();
+
+        if (player == null)
+        {
+            throw new System.ArgumentNullException("Cannot get Player component");
+        }
+
+        return player;
     }
 
     private void MoveDownwards()
@@ -48,6 +79,14 @@ public class Enemy : MonoBehaviour
         if (isOffScreen)
         {
             transform.position = new Vector3(randomXPosition, heightFromCentre, transform.position.z);
+        }
+    }
+
+    private void DestroyIfNoPlayer()
+    {
+        if (_player == null)
+        {
+            Destroy(gameObject);
         }
     }
 }
