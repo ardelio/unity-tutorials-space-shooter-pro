@@ -6,7 +6,10 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] // This make the variable an attribute and hence available withing the Editor but still remains a private variable.
-    private float _speed = 10f;
+    private float _speed = 5f;
+
+    [SerializeField]
+    private int _speedBoostMultiplier = 2;
 
     [SerializeField]
     private GameObject _laserPrefab = null;
@@ -23,9 +26,13 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserContainer = null;
 
+    [SerializeField]
+    private GameObject _shieldVisualiser = null;
+
     private float _canShootAfter = -1f;
     private SpawnManager _spawnManager = null;
     private bool _isTripleShotActive = false;
+    private bool _isShieldActive = false;
 
     void Start()
     {
@@ -35,12 +42,19 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        CalculateMovement();
+        Move();
+        EnforceBounds();
         ShootLaser();
     }
 
     public void Damage()
     {
+        if (_isShieldActive)
+        {
+            enableShield(false);
+            return;
+        }
+
         _lives--;
 
         if (_lives < 1)
@@ -50,6 +64,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void ActivateShield()
+    {
+        enableShield(true);
+    }
+
+    public void ActivateSpeedBoost()
+    {
+        _speed *= _speedBoostMultiplier;
+
+        StartCoroutine(SpeedBoostPowerDownRoutine());
+    }
+
     public void ActivateTripleShot()
     {
         _isTripleShotActive = true;
@@ -57,28 +83,31 @@ public class Player : MonoBehaviour
         StartCoroutine(TripleShotPowerDownRoutine());
     }
 
-    private void CalculateMovement()
+    private void Move()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
         transform.Translate(direction * _speed * Time.deltaTime);
+    }
 
+    private void EnforceBounds()
+    {
         float topBorder = 0f;
         float bottomBorder = -3.8f;
         float leftBorder = -11.3f;
         float rightBorder = 11.3f;
         Vector3 playerPosition = transform.position;
 
-       /* if (playerPosition.y >= topBorder)
-        {
-            transform.position = new Vector3(playerPosition.x, topBorder, playerPosition.z);
-        }
-        else if (playerPosition.y < bottomBorder)
-        {
-            transform.position = new Vector3(playerPosition.x, bottomBorder, playerPosition.z);
-        }*/
+        /* if (playerPosition.y >= topBorder)
+         {
+             transform.position = new Vector3(playerPosition.x, topBorder, playerPosition.z);
+         }
+         else if (playerPosition.y < bottomBorder)
+         {
+             transform.position = new Vector3(playerPosition.x, bottomBorder, playerPosition.z);
+         }*/
         // optimised approach is to use clamping;
 
         transform.position = new Vector3(playerPosition.x, Mathf.Clamp(playerPosition.y, bottomBorder, topBorder), playerPosition.z);
@@ -120,10 +149,23 @@ public class Player : MonoBehaviour
         newLaser.transform.SetParent(_laserContainer.transform);
     }
 
+    private IEnumerator SpeedBoostPowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5f);
+
+        _speed /= _speedBoostMultiplier;
+    }
+
     private IEnumerator TripleShotPowerDownRoutine()
     {
         yield return new WaitForSeconds(5f);
 
         _isTripleShotActive = false;
+    }
+
+    private void enableShield(bool isEnabled)
+    {
+        _isShieldActive = isEnabled;
+        _shieldVisualiser.transform.gameObject.SetActive(isEnabled);
     }
 }
