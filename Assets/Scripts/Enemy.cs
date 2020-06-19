@@ -6,10 +6,14 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 4f;
+    [SerializeField]
+    private Animator _animator = null;
     private Player _player = null;
+    private bool _isAlive = true;
 
     void Start()
     {
+        _animator = GetComponentOrThrow<Animator>(transform);
         _player = GetPlayer();
     }
 
@@ -30,8 +34,7 @@ public class Enemy : MonoBehaviour
             {
                 player.Damage();
             }
-
-            Destroy(gameObject);
+            DestructionSequence();
         }
         else if (other.CompareTag("Laser"))
         {
@@ -41,8 +44,16 @@ public class Enemy : MonoBehaviour
             {
                 _player.AddToScore(10);
             }
-            Destroy(gameObject);
+
+            DestructionSequence();
         }
+    }
+
+    private void DestructionSequence()
+    {
+        _isAlive = false;
+        _animator.SetTrigger("OnEnemyDeath");
+        Destroy(gameObject, 3f);
     }
 
     private Player GetPlayer()
@@ -54,14 +65,19 @@ public class Enemy : MonoBehaviour
             throw new System.ArgumentNullException("Cannot find GameObject with tag Player");
         }
 
-        Player player = playerGameObject.transform.GetComponent<Player>();
+        return GetComponentOrThrow<Player>(playerGameObject.transform);
+    }
 
-        if (player == null)
+    private T GetComponentOrThrow<T>(Transform _transform)
+    {
+        T component = _transform.GetComponent<T>();
+
+        if (component == null)
         {
-            throw new System.ArgumentNullException("Cannot get Player component");
+            throw new System.ArgumentNullException($"The {typeof(T).FullName} component does not exist on the {_transform.name} GameObject.");
         }
 
-        return player;
+        return component;
     }
 
     private void MoveDownwards()
@@ -76,7 +92,7 @@ public class Enemy : MonoBehaviour
         float randomXPosition = Random.Range(-horizontalWidthFromCenter, horizontalWidthFromCenter);
         bool isOffScreen = transform.position.y < -heightFromCentre;
 
-        if (isOffScreen)
+        if (isOffScreen && _isAlive)
         {
             transform.position = new Vector3(randomXPosition, heightFromCentre, transform.position.z);
         }

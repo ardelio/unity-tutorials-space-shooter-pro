@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
@@ -32,6 +33,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _score = 0;
 
+    [SerializeField]
+    private GameObject[] _engines = null;
+
     private float _canShootAfter = -1f;
     private SpawnManager _spawnManager = null;
     private UIManager _uiManager = null;
@@ -46,15 +50,25 @@ public class Player : MonoBehaviour
 
         if (_spawnManager == null)
         {
-            throw new System.Exception("SpawnManager not found");
+            throw new ArgumentNullException("SpawnManager not found");
         }
 
         if (_uiManager == null)
         {
-            throw new System.Exception("UIManager not found");
+            throw new ArgumentNullException("UIManager not found");
         }
 
         _uiManager.UpdateScore(_score);
+
+        if (_engines == null || _engines.Length != 2)
+        {
+            throw new ArgumentNullException("Engines not added not found");
+        }
+
+        foreach (GameObject engine in _engines)
+        {
+            engine.SetActive(false);
+        }
     }
 
     void Update()
@@ -73,6 +87,8 @@ public class Player : MonoBehaviour
         }
 
         _lives--;
+
+        DamageEngines();
 
         _uiManager.UpdateLives(_lives);
 
@@ -99,6 +115,14 @@ public class Player : MonoBehaviour
         _isTripleShotActive = true;
 
         StartCoroutine(TripleShotPowerDownRoutine());
+    }
+
+    private void DamageEngines()
+    {
+        if (_lives >= 1)
+        {
+            _engines[_lives - 1].SetActive(true);
+        }
     }
 
     private void Move()

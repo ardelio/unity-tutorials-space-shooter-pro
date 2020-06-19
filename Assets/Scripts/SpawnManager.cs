@@ -18,7 +18,7 @@ public class SpawnManager : MonoBehaviour
 
     private bool _canSpawn = true;
 
-    void Start()
+    public void StartSpawning()
     {
         StartCoroutine(SpawnEnemyRoutine());
         StartCoroutine(SpawnPowerUpRoutine());
@@ -26,6 +26,8 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator SpawnEnemyRoutine()
     {
+        yield return new WaitForSeconds(3f);
+
         while(_canSpawn)
         {
             float yPosition = 8f;
@@ -41,6 +43,8 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator SpawnPowerUpRoutine()
     {
+        yield return new WaitForSeconds(3f);
+
         while (_canSpawn)
         {
             float yPosition = 8f;
