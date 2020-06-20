@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65e486e4de6e5448a8fbb43dc8756a0, type: 3}
   m_Name: Grain
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 0
@@ -62,25 +62,25 @@ MonoBehaviour:
     value: 1
   intensity:
     overrideState: 1
-    value: 29.32
+    value: 48.74
   threshold:
     overrideState: 1
-    value: 1
+    value: 1.05
   softKnee:
     overrideState: 1
-    value: 0.5
+    value: 0.554
   clamp:
     overrideState: 1
     value: 65472
   diffusion:
     overrideState: 1
-    value: 7
+    value: 7.55
   anamorphicRatio:
     overrideState: 1
     value: 0
   color:
     overrideState: 1
-    value: {r: 1, g: 1, b: 1, a: 1}
+    value: {r: 0.89411765, g: 0.36982396, b: 0, a: 1}
   fastMode:
     overrideState: 1
     value: 0
@@ -103,13 +103,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
   gradingMode:
     overrideState: 1
-    value: 1
+    value: 0
   externalLut:
     overrideState: 1
     value: {fileID: 0}
@@ -144,28 +144,28 @@ MonoBehaviour:
     value: 1
   temperature:
     overrideState: 1
-    value: -15
+    value: -27
   tint:
-    overrideState: 1
-    value: 28
+    overrideState: 0
+    value: 14
   colorFilter:
-    overrideState: 1
-    value: {r: 1, g: 1, b: 1, a: 1}
+    overrideState: 0
+    value: {r: 1.5157166, g: 1.5157166, b: 1.5157166, a: 1}
   hueShift:
-    overrideState: 1
-    value: 0
+    overrideState: 0
+    value: -6
   saturation:
-    overrideState: 1
-    value: 0
+    overrideState: 0
+    value: -2
   brightness:
-    overrideState: 1
-    value: 0
+    overrideState: 0
+    value: 60
   postExposure:
     overrideState: 1
     value: 1.78
   contrast:
-    overrideState: 1
-    value: 0
+    overrideState: 0
+    value: -40
   mixerRedOutRedIn:
     overrideState: 1
     value: 100

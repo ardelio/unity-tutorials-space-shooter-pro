@@ -11,6 +11,7 @@ public class Asteroid : MonoBehaviour
     private GameObject _explosionPrefab = null;
     private Animator _explosionAnimator = null;
     private SpawnManager _spawnManager = null;
+    private bool _alive = true;
 
     private void Start()
     {
@@ -41,8 +42,9 @@ public class Asteroid : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Laser"))
+        if (other.CompareTag("Laser") && _alive)
         {
+            _alive = false;
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
             Destroy(other.gameObject);
             _spawnManager.StartSpawning();

@@ -10,11 +10,13 @@ public class Enemy : MonoBehaviour
     private Animator _animator = null;
     private Player _player = null;
     private bool _isAlive = true;
+    private AudioSource _audioSource = null;
 
     void Start()
     {
         _animator = GetComponentOrThrow<Animator>(transform);
-        _player = GetPlayer();
+        _audioSource = GetComponentOrThrow<AudioSource>(transform);
+        _player = GetComponentOrThrow<Player>(FindGameObjectOrThrow("Player").transform);
     }
 
     void Update()
@@ -26,6 +28,11 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!_isAlive)
+        {
+            return;
+        }
+
         if (other.CompareTag("Player"))
         {
             Player player = other.transform.GetComponent<Player>();
@@ -53,19 +60,20 @@ public class Enemy : MonoBehaviour
     {
         _isAlive = false;
         _animator.SetTrigger("OnEnemyDeath");
+        _audioSource.Play();
         Destroy(gameObject, 3f);
     }
 
-    private Player GetPlayer()
+    private GameObject FindGameObjectOrThrow(string name)
     {
-        GameObject playerGameObject = GameObject.FindGameObjectWithTag("Player");
+        GameObject gameObject = GameObject.Find(name);
 
-        if (playerGameObject == null)
+        if (gameObject == null)
         {
-            throw new System.ArgumentNullException("Cannot find GameObject with tag Player");
+            throw new System.ArgumentNullException($"Cannot find GameObject {name}");
         }
 
-        return GetComponentOrThrow<Player>(playerGameObject.transform);
+        return gameObject;
     }
 
     private T GetComponentOrThrow<T>(Transform _transform)

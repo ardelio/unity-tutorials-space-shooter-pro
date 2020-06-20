@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 911618183}
   m_Layer: 0
   m_Name: SpeedPowerup
-  m_TagString: Untagged
+  m_TagString: PowerUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,6 +146,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 3
   _powerUpId: 1
+  _audioclip: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
+  _volume: 3
 --- !u!95 &911618183
 Animator:
   serializedVersion: 3

@@ -10,6 +10,9 @@ public class PowerUp : MonoBehaviour
     [SerializeField]
     private PowerUpId _powerUpId = PowerUpId.TRIPLE_SHOT;
 
+    [SerializeField]
+    private AudioClip _audioclip = null;
+
     public enum PowerUpId
     {
         TRIPLE_SHOT = 0,
@@ -17,7 +20,7 @@ public class PowerUp : MonoBehaviour
         SHIELD = 2,
     }
 
-    void Update()
+    private void Update()
     {
         MoveDown();
         DestroyIfOffScreen();
@@ -32,6 +35,7 @@ public class PowerUp : MonoBehaviour
             {
                 ActivatePowerUp(player);
             }
+            AudioSource.PlayClipAtPoint(_audioclip, Camera.main.transform.position, 1f);
             Destroy(gameObject);
         }
     }

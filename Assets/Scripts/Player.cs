@@ -36,46 +36,33 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _engines = null;
 
+    [SerializeField]
+    private AudioClip _laserShotAudioClip = null;
+
     private float _canShootAfter = -1f;
     private SpawnManager _spawnManager = null;
     private UIManager _uiManager = null;
     private bool _isTripleShotActive = false;
     private bool _isShieldActive = false;
+    private AudioSource _audioSource = null;
 
-    void Start()
+    public void ActivateShield()
     {
-        transform.position = new Vector3(0, -3f, 0);
-        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
-        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-
-        if (_spawnManager == null)
-        {
-            throw new ArgumentNullException("SpawnManager not found");
-        }
-
-        if (_uiManager == null)
-        {
-            throw new ArgumentNullException("UIManager not found");
-        }
-
-        _uiManager.UpdateScore(_score);
-
-        if (_engines == null || _engines.Length != 2)
-        {
-            throw new ArgumentNullException("Engines not added not found");
-        }
-
-        foreach (GameObject engine in _engines)
-        {
-            engine.SetActive(false);
-        }
+        enableShield(true);
     }
 
-    void Update()
+    public void ActivateSpeedBoost()
     {
-        Move();
-        EnforceBounds();
-        ShootLaser();
+        _speed *= _speedBoostMultiplier;
+
+        StartCoroutine(SpeedBoostPowerDownRoutine());
+    }
+
+    public void ActivateTripleShot()
+    {
+        _isTripleShotActive = true;
+
+        StartCoroutine(TripleShotPowerDownRoutine());
     }
 
     public void Damage()
@@ -98,23 +85,61 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ActivateShield()
+    public void AddToScore(int points)
     {
-        enableShield(true);
+        _score += points;
+        _uiManager.UpdateScore(_score);
     }
 
-    public void ActivateSpeedBoost()
+    private void Start()
     {
-        _speed *= _speedBoostMultiplier;
+        transform.position = new Vector3(0, -3f, 0);
+        _spawnManager = GetComponentOrThrow<SpawnManager>(FindGameObjectOrThrow("SpawnManager").transform);
+        _uiManager = GetComponentOrThrow<UIManager>(FindGameObjectOrThrow("Canvas").transform);
+        _audioSource = GetComponentOrThrow<AudioSource>(transform);
 
-        StartCoroutine(SpeedBoostPowerDownRoutine());
+        _uiManager.UpdateScore(_score);
+
+        if (_engines == null || _engines.Length != 2)
+        {
+            throw new ArgumentNullException("Engines not added not found");
+        }
+
+        foreach (GameObject engine in _engines)
+        {
+            engine.SetActive(false);
+        }
     }
 
-    public void ActivateTripleShot()
+    private void Update()
     {
-        _isTripleShotActive = true;
+        Move();
+        EnforceBounds();
+        ShootLaser();
+    }
 
-        StartCoroutine(TripleShotPowerDownRoutine());
+    private GameObject FindGameObjectOrThrow(string name)
+    {
+        GameObject gameObject = GameObject.Find(name);
+
+        if (gameObject == null)
+        {
+            throw new System.ArgumentNullException($"Cannot find GameObject {name}");
+        }
+
+        return gameObject;
+    }
+
+    private T GetComponentOrThrow<T>(Transform _transform)
+    {
+        T component = _transform.GetComponent<T>();
+
+        if (component == null)
+        {
+            throw new System.ArgumentNullException($"The {typeof(T).FullName} component does not exist on the {_transform.name} GameObject.");
+        }
+
+        return component;
     }
 
     private void DamageEngines()
@@ -193,14 +218,16 @@ public class Player : MonoBehaviour
             Vector3 spawnPosition = transform.position + offset;
             newLaser = Instantiate(_laserPrefab, spawnPosition, Quaternion.identity);
         }
+
+        PlayClip(_laserShotAudioClip);
         
         newLaser.transform.SetParent(_laserContainer.transform);
     }
 
-    public void AddToScore(int points)
+    private void PlayClip(AudioClip clip)
     {
-        _score += points;
-        _uiManager.UpdateScore(_score);
+        _audioSource.clip = clip;
+        _audioSource.Play();
     }
 
     private IEnumerator SpeedBoostPowerDownRoutine()
