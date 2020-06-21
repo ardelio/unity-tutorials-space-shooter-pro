@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private bool _isGameOver = false;
+    private enum GameState
+    {
+        PAUSE = 0,
+        RUN = 1,
+    }
 
     void Update()
     {
@@ -21,5 +26,20 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         _isGameOver = true;
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = (float)GameState.PAUSE;
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = (float)GameState.RUN;
     }
 }

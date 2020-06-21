@@ -15,27 +15,22 @@ public class UIManager : MonoBehaviour
     private Image _livesImg = null;
     [SerializeField]
     private Sprite[] _livesSprites = null;
+    [SerializeField]
+    private GameObject _exitGamePanel = null;
 
     private GameManager _gameManager = null;
 
     private void Start()
     {
+        _gameManager = GetComponentOrThrow<GameManager>(FindGameObjectOrThrow("GameManager").transform);
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
-        
-        GameObject gameManagerGameObject = GameObject.Find("GameManager");
+        _exitGamePanel.SetActive(false);
+    }
 
-        if (gameManagerGameObject == null)
-        {
-            throw new System.ArgumentNullException("[UIManager] GameManager game object not found");
-        }
-
-        _gameManager = gameManagerGameObject.GetComponent<GameManager>();
-
-        if (_gameManager == null)
-        {
-            throw new System.ArgumentNullException("[UIManager] GameManager component not found");
-        }
+    private void Update()
+    {
+        WasEscapeKeyPressed();
     }
 
     public void UpdateScore(int playerScore)
@@ -53,11 +48,52 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void CloseExitPanel()
+    {
+        _exitGamePanel.SetActive(false);
+        _gameManager.ResumeGame();
+    }
+
+    private GameObject FindGameObjectOrThrow(string name)
+    {
+        GameObject gameObject = GameObject.Find(name);
+
+        if (gameObject == null)
+        {
+            throw new System.ArgumentNullException($"Cannot find GameObject {name}");
+        }
+
+        return gameObject;
+    }
+
+    private T GetComponentOrThrow<T>(Transform _transform)
+    {
+        T component = _transform.GetComponent<T>();
+
+        if (component == null)
+        {
+            throw new System.ArgumentNullException($"The {typeof(T).FullName} component does not exist on the {_transform.name} GameObject.");
+        }
+
+        return component;
+    }
+
     private void GameOver()
     {
         StartCoroutine(GameOverTextFlickerRoutine());
         _restartText.gameObject.SetActive(true);
         _gameManager.GameOver();
+    }
+
+    private void WasEscapeKeyPressed()
+    {
+        bool escapeKeyWasPressed = Input.GetKeyDown(KeyCode.Escape);
+
+        if (escapeKeyWasPressed)
+        {
+            _exitGamePanel.SetActive(true);
+            _gameManager.PauseGame();
+        }
     }
 
     private IEnumerator GameOverTextFlickerRoutine()
